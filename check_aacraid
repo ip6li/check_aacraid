@@ -159,7 +159,8 @@ def cmk_info(controllerid):
         linfo = get_logicaldevice_info(controllerid,l)
         status = 0
 	statustxt = 'OK'
-	if linfo['status'] != 'Optimal':
+        re_volume_ok = re.compile ('Optimal|None')
+        if (not re_volume_ok.match (str(linfo['status']))):
                 status = 2
 		statustxt = 'CRITICAL'
 	item_name = 'LogicalDevice_'+linfo['id']
@@ -185,10 +186,11 @@ def cmk_info(controllerid):
     disks = get_disks_info(controllerid)
     disk_keys = disks.keys()
     disk_keys.sort()
+    re_disk_ok = re.compile ('.*Hot-Spare|Online|None')
     for k in disk_keys:
             status = 0
             statustxt = 'OK'
-            if disks[k]['status'] != 'Online':
+            if (not re_disk_ok.match(disks[k]['status'])):
                         status = 2 
 			statustxt = 'CRITICAL'
             item_name = 'Disk_'+disks[k]['id']
